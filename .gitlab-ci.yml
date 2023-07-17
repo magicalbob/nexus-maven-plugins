@@ -1,0 +1,30 @@
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  tag: linux
+  script:
+    - private-pipeline-library
+    - jenkins-shared
+    - mavenSnapshotPipeline
+        usePublicSettingsXmlFile: false,
+        mavenVersion: 'Maven 3.5.x',
+        deployBranch: 'main'
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  tag: linux
+  script:
+    - notifyChat
+        env: $CI_ENVIRONMENT_NAME
+        currentBuild: $CI_JOB_ID
+        room: 'nxrm-notifications'
+  when: on_success
+  only:
+    - main
+  allow_failure: true
+
